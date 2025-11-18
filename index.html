@@ -1,222 +1,201 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Salary Estimator</title>
-    <!-- Load Tailwind CSS for modern styling and responsiveness -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* Custom styles */
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #f7f7f7;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            padding: 16px;
-        }
-    </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Salary Estimator — AI Demo</title>
+  <style>
+    /* Minimal modern styling */
+    :root{
+      --bg:#0f1724; --card:#0b1220; --muted:#9aa7c0; --accent:#6ee7b7;
+      --glass: rgba(255,255,255,0.03);
+      font-family: Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    }
+    html,body{height:100%}
+    body{
+      margin:0; background:linear-gradient(180deg,#071024 0%, #081226 60%);
+      color:#e6eef8; display:flex; align-items:center; justify-content:center; padding:28px;
+    }
+    .card{
+      width:100%; max-width:760px; background:var(--card); border-radius:16px; padding:28px;
+      box-shadow: 0 8px 30px rgba(2,6,23,0.6); border:1px solid rgba(255,255,255,0.03);
+      backdrop-filter: blur(6px);
+    }
+    h1{margin:0 0 6px 0; font-size:22px}
+    p.lead{margin:0 0 18px 0; color:var(--muted)}
+    .grid{display:grid; grid-template-columns:repeat(2,1fr); gap:14px;}
+    label{display:block; font-size:12px; color:var(--muted); margin-bottom:6px}
+    select, button{
+      width:100%; padding:10px 12px; border-radius:10px; border:1px solid rgba(255,255,255,0.04);
+      background:var(--glass); color:inherit; font-size:15px;
+    }
+    .controls{margin-top:16px; display:flex; gap:12px;}
+    .controls button{flex:1; cursor:pointer}
+    .btn-primary{background:linear-gradient(90deg,#0ea5a4,#7dd3fc); color:#042022; border:none; font-weight:600}
+    .btn-ghost{background:transparent; border:1px solid rgba(255,255,255,0.06)}
+    .result{
+      margin-top:20px; padding:18px; border-radius:12px; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+      display:none;
+    }
+    .big{font-size:28px; font-weight:700; margin:6px 0}
+    .muted{color:var(--muted); font-size:13px}
+    footer{margin-top:14px; font-size:13px; color:var(--muted)}
+    @media (max-width:640px){
+      .grid{grid-template-columns:1fr}
+    }
+  </style>
 </head>
 <body>
+  <main class="card" role="main">
+    <h1>Salary Estimator — AI Demo</h1>
+    <p class="lead">A simple demo app to show AI-style estimation logic. Not for real financial advice — just a technical sample.</p>
 
-    <div id="app-container" class="w-full max-w-lg bg-white p-6 md:p-10 rounded-xl shadow-2xl border border-gray-100">
+    <div class="grid" aria-hidden="false">
+      <div>
+        <label for="age">Age</label>
+        <select id="age">
+          <option value="22-29">22–29</option>
+          <option value="30-39">30–39</option>
+          <option value="40-49">40–49</option>
+          <option value="50+">50+</option>
+        </select>
+      </div>
 
-        <!-- Loading Indicator -->
-        <div id="loading-indicator" class="hidden text-center p-8">
-            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
-            <p class="mt-4 text-gray-600">Simulating complex AI calculations and analyzing market data...</p>
-        </div>
-        
-        <!-- Screen 1: Input Form -->
-        <div id="input-screen">
-            <h1 class="text-3xl font-extrabold text-indigo-700 mb-6 text-center">
-                ✨ AI Salary Potential Estimator ✨
-            </h1>
-            <p class="text-gray-500 mb-8 text-center">
-                (Simulated LLM-Powered Analysis)
-            </p>
+      <div>
+        <label for="skills">Technical skills</label>
+        <select id="skills">
+          <option value="entry">Entry (Python, SQL basics)</option>
+          <option value="intermediate">Intermediate (APIs, React, Docker)</option>
+          <option value="advanced">Advanced (ML pipelines, infra)</option>
+          <option value="fullstack">Full-stack / Lead</option>
+        </select>
+      </div>
 
-            <!-- Dropdown: Age -->
-            <label for="age" class="block text-sm font-medium text-gray-700 mb-1">Age Range</label>
-            <select id="age" class="w-full p-3 mb-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 transition duration-150">
-                <option value="20-25">20 - 25</option>
-                <option value="26-35" selected>26 - 35</option>
-                <option value="36-45">36 - 45</option>
-                <option value="45+">45+</option>
-            </select>
+      <div>
+        <label for="state">State where you live</label>
+        <select id="state">
+          <option value="low">Lower cost — e.g., Midwest/South</option>
+          <option value="medium">Medium cost — e.g., Texas/Florida</option>
+          <option value="high">High cost — e.g., CA/NY/MA</option>
+        </select>
+      </div>
 
-            <!-- Dropdown: Years of Experience -->
-            <label for="experience" class="block text-sm font-medium text-gray-700 mb-1">Years of Experience</label>
-            <select id="experience" class="w-full p-3 mb-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 transition duration-150">
-                <option value="0-2">0 - 2 Years (Junior)</option>
-                <option value="3-5" selected>3 - 5 Years (Mid)</option>
-                <option value="6-10">6 - 10 Years (Senior)</option>
-                <option value="10+">10+ Years (Expert)</option>
-            </select>
-
-            <!-- Dropdown: Technical Skills -->
-            <label for="skills" class="block text-sm font-medium text-gray-700 mb-1">Technical Skills</label>
-            <select id="skills" class="w-full p-3 mb-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 transition duration-150">
-                <option value="Full Stack Development">Full Stack Development</option>
-                <option value="Data Science/AI" selected>Data Science/AI</option>
-                <option value="Cloud Engineering">Cloud Engineering</option>
-                <option value="Mobile Development">Mobile Development</option>
-            </select>
-
-            <!-- Dropdown: State where you live -->
-            <label for="location" class="block text-sm font-medium text-gray-700 mb-1">Location (Major Tech Hubs)</label>
-            <select id="location" class="w-full p-3 mb-6 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 transition duration-150">
-                <option value="Silicon Valley, CA" selected>Silicon Valley, CA</option>
-                <option value="New York, NY">New York, NY</option>
-                <option value="Seattle, WA">Seattle, WA</option>
-                <option value="Austin, TX">Austin, TX</option>
-                <option value="Non-US Major City">Non-US Major City</option>
-            </select>
-
-            <button id="start-button" class="w-full bg-indigo-600 text-white font-semibold py-3 rounded-xl hover:bg-indigo-700 transition duration-200 shadow-md">
-                💼 Estimate Salary Potential (Start)
-            </button>
-        </div>
-
-        <!-- Screen 2: Results -->
-        <div id="results-screen" class="hidden text-center">
-            <h2 class="text-3xl font-bold text-green-600 mb-4">
-                Salary Potential Forecast
-            </h2>
-            <div class="bg-indigo-50 p-6 rounded-xl mb-6 shadow-inner">
-                <p class="text-lg text-gray-600">Based on your input, the AI forecasts your salary potential as:</p>
-                <p id="salary-result" class="text-5xl font-extrabold text-indigo-700 mt-2 mb-4">
-                    --
-                </p>
-            </div>
-
-            <div class="bg-gray-100 p-4 rounded-lg mb-8 text-left">
-                <h3 class="text-xl font-semibold text-gray-800 mb-2">AI Justification:</h3>
-                <p id="justification-text" class="text-gray-600 leading-relaxed italic">
-                    --
-                </p>
-            </div>
-
-            <button id="return-button" class="w-full bg-gray-500 text-white font-semibold py-3 rounded-xl hover:bg-gray-600 transition duration-200">
-                Return (Go Back)
-            </button>
-        </div>
+      <div>
+        <label for="exp">Years of experience</label>
+        <select id="exp">
+          <option value="0-1">0–1</option>
+          <option value="2-4">2–4</option>
+          <option value="5-8">5–8</option>
+          <option value="9+">9+</option>
+        </select>
+      </div>
     </div>
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const inputScreen = document.getElementById('input-screen');
-            const resultsScreen = document.getElementById('results-screen');
-            const startButton = document.getElementById('start-button');
-            const returnButton = document.getElementById('return-button');
-            const loadingIndicator = document.getElementById('loading-indicator');
-            const salaryResultEl = document.getElementById('salary-result');
-            const justificationTextEl = document.getElementById('justification-text');
+    <div class="controls">
+      <button id="startBtn" class="btn-primary" aria-live="polite">Start</button>
+      <button id="resetBtn" class="btn-ghost">Reset</button>
+    </div>
 
-            // --- UI Helper Functions ---
-            const showScreen = (screenToShow) => {
-                inputScreen.classList.add('hidden');
-                resultsScreen.classList.add('hidden');
-                loadingIndicator.classList.add('hidden');
-                document.getElementById(screenToShow).classList.remove('hidden');
-            };
+    <div id="result" class="result" role="status" aria-live="polite">
+      <div class="muted">Estimated annual salary</div>
+      <div id="salary" class="big">$0</div>
+      <div id="explain" class="muted">Explanation: ...</div>
+      <div style="margin-top:12px;">
+        <button id="goback" class="btn-ghost">Go back</button>
+      </div>
+    </div>
 
-            /**
-             * Simulated LLM function to calculate salary and justification.
-             * This function replaces the unreliable API call with deterministic, variable logic
-             * to demonstrate structured data processing.
-             */
-            async function simulateSalaryEstimate() {
-                // Introduce a delay to mimic API latency (demonstrates async coding)
-                await new Promise(resolve => setTimeout(resolve, 1500)); 
+    <footer>Demo app • Push to GitHub & enable Pages to share the link.</footer>
+  </main>
 
-                // 1. Collect user inputs
-                const age = document.getElementById('age').value;
-                const experience = document.getElementById('experience').value;
-                const skills = document.getElementById('skills').value;
-                const location = document.getElementById('location').value;
-                
-                let baseSalary = 80000; // Starting base salary (USD)
-                let multiplier = 1.0;
-                let justification = "Based on entry-level parameters, your starting potential is competitive. Focus on skill development!";
+  <script>
+    // Lightweight deterministic "AI-style" estimator.
+    const startBtn = document.getElementById('startBtn');
+    const resetBtn = document.getElementById('resetBtn');
+    const goback = document.getElementById('goback');
+    const resultCard = document.getElementById('result');
+    const salaryEl = document.getElementById('salary');
+    const explainEl = document.getElementById('explain');
 
-                // 2. Adjust Multiplier based on Experience
-                if (experience === '3-5') {
-                    multiplier += 0.4; // Mid-level boost
-                    justification = "Your solid experience foundation positions you well above the average. Market data indicates strong growth potential.";
-                } else if (experience === '6-10') {
-                    multiplier += 0.8; // Senior boost
-                    justification = "As a highly experienced candidate, your salary reflects strong industry recognition and leadership capabilities.";
-                } else if (experience === '10+') {
-                    multiplier += 1.2; // Expert boost
-                    justification = "With over a decade of expertise, your strategic value commands a premium in the global tech market.";
-                }
+    function skillScore(skill){
+      return {entry:0.9, intermediate:1.15, advanced:1.55, fullstack:1.9}[skill] || 1;
+    }
+    function stateMultiplier(state){
+      return {low:0.88, medium:1.0, high:1.32}[state] || 1;
+    }
+    function expFactor(exp){
+      // map buckets to growth
+      return {'0-1':0.85, '2-4':1.05, '5-8':1.35, '9+':1.7}[exp] || 1;
+    }
+    function ageFactor(age){
+      return {'22-29':1.0, '30-39':1.08, '40-49':1.03, '50+':0.95}[age] || 1;
+    }
 
-                // 3. Adjust Multiplier based on Skills
-                if (skills === 'Data Science/AI' || skills === 'Cloud Engineering') {
-                    multiplier += 0.3; // High-demand skill boost
-                    justification += " Furthermore, your high-demand **" + skills + "** expertise adds significant value, pushing your ceiling higher.";
-                } else if (skills === 'Full Stack Development') {
-                    multiplier += 0.15;
-                    justification += " The versatility of your **" + skills + "** skills ensures a consistent and high market demand.";
-                }
+    // Base salary notion — e.g., "AI-ish" baseline influenced by randomness seed based on selections
+    function baseSalarySeed(sk, ex){
+      // deterministic pseudo-random by hashing strings
+      const s = (sk + '|' + ex).split('').reduce((a,c)=>((a<<5)-a)+c.charCodeAt(0), 0);
+      const noise = (Math.abs(s) % 21 - 10) / 100; // -0.10 .. +0.10
+      return 52000 * (1 + noise); // baseline ~$52k +/- 10%
+    }
 
-                // 4. Adjust Multiplier based on Location (Cost of Living/Tech Demand)
-                if (location === 'Silicon Valley, CA' || location === 'New York, NY' || location === 'Seattle, WA') {
-                    multiplier += 0.5; // High cost of living/tech concentration boost
-                    justification += " Finally, your location in a premium market like **" + location + "** significantly adjusts the compensation floor upwards.";
-                } else if (location === 'Austin, TX') {
-                    multiplier += 0.25;
-                    justification += " Your presence in the growing tech hub of **" + location + "** gives you excellent negotiating power.";
-                }
-                
-                // 5. Final Calculation and Formatting
-                const calculatedSalary = Math.round((baseSalary * multiplier) / 5000) * 5000; // Round to nearest $5,000 for a cleaner estimate
-                const formattedSalary = new Intl.NumberFormat('en-US', {
-                    style: 'currency',
-                    currency: 'USD',
-                    minimumFractionDigits: 0,
-                    maximumFractionDigits: 0,
-                }).format(calculatedSalary);
+    function formatUSD(n){
+      return n.toLocaleString('en-US', {style:'currency', currency:'USD', maximumFractionDigits:0});
+    }
 
-                // Simulate the structured JSON output (demonstrates LLM structured response handling)
-                return {
-                    estimatedSalary: formattedSalary,
-                    justification: justification
-                };
-            }
+    startBtn.addEventListener('click', ()=>{
+      const age = document.getElementById('age').value;
+      const skills = document.getElementById('skills').value;
+      const state = document.getElementById('state').value;
+      const exp = document.getElementById('exp').value;
 
-            // --- Event Handlers ---
-            startButton.addEventListener('click', async () => {
-                showScreen('loading-indicator');
+      // combine factors
+      const base = baseSalarySeed(skills, exp);
+      const sScore = skillScore(skills);
+      const st = stateMultiplier(state);
+      const exf = expFactor(exp);
+      const ag = ageFactor(age);
 
-                try {
-                    // Call the simulated function
-                    const data = await simulateSalaryEstimate();
-                    
-                    // Update UI with structured results
-                    salaryResultEl.textContent = data.estimatedSalary;
-                    justificationTextEl.textContent = data.justification;
+      // final estimate formula (simple weighted multiplicative model)
+      let estimate = base * sScore * st * exf * ag;
 
-                    showScreen('results-screen');
-                } catch (error) {
-                    console.error("Critical failure during simulation:", error);
-                    // Show a friendly error/fallback message
-                    salaryResultEl.textContent = "N/A";
-                    justificationTextEl.textContent = "Sorry, an internal error occurred during calculation. (Please try again)."; 
-                    showScreen('results-screen');
-                }
-            });
+      // small rounding + deterministic "AI polish"
+      estimate = Math.round(estimate / 1000) * 1000;
 
-            returnButton.addEventListener('click', () => {
-                showScreen('input-screen');
-            });
+      // show result
+      salaryEl.textContent = formatUSD(estimate);
 
-            // Initial view
-            showScreen('input-screen');
-        });
-    </script>
+      // short explanation (so it looks like a model output)
+      const explanation = [
+        `Baseline: ${formatUSD(Math.round(base))}`,
+        `Skills multiplier: x${sScore.toFixed(2)}`,
+        `State cost multiplier: x${st.toFixed(2)}`,
+        `Experience multiplier: x${exf.toFixed(2)}`,
+        `Age adjustment: x${ag.toFixed(2)}`
+      ].join(' • ');
+
+      explainEl.textContent = explanation;
+
+      resultCard.style.display = 'block';
+      // optionally hide controls so the page reads like a small app
+      window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+    });
+
+    goback.addEventListener('click', ()=>{
+      resultCard.style.display = 'none';
+    });
+
+    resetBtn.addEventListener('click', ()=>{
+      document.getElementById('age').selectedIndex = 0;
+      document.getElementById('skills').selectedIndex = 0;
+      document.getElementById('state').selectedIndex = 0;
+      document.getElementById('exp').selectedIndex = 0;
+      resultCard.style.display = 'none';
+    });
+
+    // Accessibility: allow enter to trigger Start when focusing it
+    startBtn.addEventListener('keyup', (e)=>{ if(e.key === 'Enter') startBtn.click(); });
+  </script>
 </body>
 </html>
+
