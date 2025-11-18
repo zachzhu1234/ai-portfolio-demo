@@ -1,0 +1,242 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Salary Estimator</title>
+    <!-- Load Tailwind CSS for modern styling and responsiveness -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Custom styles */
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f7f7;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 16px;
+        }
+    </style>
+</head>
+<body>
+
+    <div id="app-container" class="w-full max-w-lg bg-white p-6 md:p-10 rounded-xl shadow-2xl border border-gray-100">
+
+        <!-- Loading Indicator -->
+        <div id="loading-indicator" class="hidden text-center p-8">
+            <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
+            <p class="mt-4 text-gray-600">Calculating complex AI estimations...</p>
+        </div>
+        
+        <!-- Screen 1: Input Form -->
+        <div id="input-screen">
+            <h1 class="text-3xl font-extrabold text-indigo-700 mb-6 text-center">
+                ✨ AI Salary Potential Estimator ✨
+            </h1>
+            <p class="text-gray-500 mb-8 text-center">
+                (Powered by Simulated Gemini AI Logic)
+            </p>
+
+            <!-- Dropdown: Age -->
+            <label for="age" class="block text-sm font-medium text-gray-700 mb-1">Age Range</label>
+            <select id="age" class="w-full p-3 mb-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 transition duration-150">
+                <option value="20-25">20 - 25</option>
+                <option value="26-35" selected>26 - 35</option>
+                <option value="36-45">36 - 45</option>
+                <option value="45+">45+</option>
+            </select>
+
+            <!-- Dropdown: Years of Experience -->
+            <label for="experience" class="block text-sm font-medium text-gray-700 mb-1">Years of Experience</label>
+            <select id="experience" class="w-full p-3 mb-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 transition duration-150">
+                <option value="0-2">0 - 2 Years (Junior)</option>
+                <option value="3-5" selected>3 - 5 Years (Mid)</option>
+                <option value="6-10">6 - 10 Years (Senior)</option>
+                <option value="10+">10+ Years (Expert)</option>
+            </select>
+
+            <!-- Dropdown: Technical Skills -->
+            <label for="skills" class="block text-sm font-medium text-gray-700 mb-1">Technical Skills</label>
+            <select id="skills" class="w-full p-3 mb-4 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 transition duration-150">
+                <option value="Full Stack Development">Full Stack Development</option>
+                <option value="Data Science/AI" selected>Data Science/AI</option>
+                <option value="Cloud Engineering">Cloud Engineering</option>
+                <option value="Mobile Development">Mobile Development</option>
+            </select>
+
+            <!-- Dropdown: State where you live -->
+            <label for="location" class="block text-sm font-medium text-gray-700 mb-1">Location (Major Tech Hubs)</label>
+            <select id="location" class="w-full p-3 mb-6 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 transition duration-150">
+                <option value="Silicon Valley, CA" selected>Silicon Valley, CA</option>
+                <option value="New York, NY">New York, NY</option>
+                <option value="Seattle, WA">Seattle, WA</option>
+                <option value="Austin, TX">Austin, TX</option>
+                <option value="Non-US Major City">Non-US Major City</option>
+            </select>
+
+            <button id="start-button" class="w-full bg-indigo-600 text-white font-semibold py-3 rounded-xl hover:bg-indigo-700 transition duration-200 shadow-md">
+                💼 Estimate Salary Potential (Start)
+            </button>
+        </div>
+
+        <!-- Screen 2: Results -->
+        <div id="results-screen" class="hidden text-center">
+            <h2 class="text-3xl font-bold text-green-600 mb-4">
+                Salary Potential Forecast
+            </h2>
+            <div class="bg-indigo-50 p-6 rounded-xl mb-6 shadow-inner">
+                <p class="text-lg text-gray-600">Based on your input, the AI forecasts your salary potential as:</p>
+                <p id="salary-result" class="text-5xl font-extrabold text-indigo-700 mt-2 mb-4">
+                    --
+                </p>
+            </div>
+
+            <div class="bg-gray-100 p-4 rounded-lg mb-8 text-left">
+                <h3 class="text-xl font-semibold text-gray-800 mb-2">AI Justification:</h3>
+                <p id="justification-text" class="text-gray-600 leading-relaxed italic">
+                    --
+                </p>
+            </div>
+
+            <button id="return-button" class="w-full bg-gray-500 text-white font-semibold py-3 rounded-xl hover:bg-gray-600 transition duration-200">
+                Return (Go Back)
+            </button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const inputScreen = document.getElementById('input-screen');
+            const resultsScreen = document.getElementById('results-screen');
+            const startButton = document.getElementById('start-button');
+            const returnButton = document.getElementById('return-button');
+            const loadingIndicator = document.getElementById('loading-indicator');
+            const salaryResultEl = document.getElementById('salary-result');
+            const justificationTextEl = document.getElementById('justification-text');
+
+            // --- Authentication and Configuration ---
+            const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+            const apiKey = ""; // Leave as-is for Canvas environment
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
+
+            // --- UI Helper Functions ---
+            const showScreen = (screenToShow) => {
+                inputScreen.classList.add('hidden');
+                resultsScreen.classList.add('hidden');
+                loadingIndicator.classList.add('hidden');
+                document.getElementById(screenToShow).classList.remove('hidden');
+            };
+
+            // --- LLM API Logic (Demonstrating AI Coding Knowledge) ---
+            async function getSalaryEstimate() {
+                // 1. Collect user inputs
+                const age = document.getElementById('age').value;
+                const experience = document.getElementById('experience').value;
+                const skills = document.getElementById('skills').value;
+                const location = document.getElementById('location').value;
+
+                // 2. Construct the system prompt and user query
+                const systemPrompt = "You are a professional AI Salary Predictor specializing in tech jobs. Provide a highly optimistic and encouraging salary estimate. The output MUST be a strict JSON object following the provided schema.";
+                
+                const userQuery = `Estimate the annual base salary for a person with the following attributes:
+                    - Age Range: ${age}
+                    - Experience Level: ${experience}
+                    - Primary Skills: ${skills}
+                    - Location: ${location}
+                    Provide the estimated salary formatted as a string (e.g., "$150,000") and a confident, positive justification in English.`; // <-- Requesting justification in English
+                
+                // 3. Define the desired structured JSON output schema
+                const responseSchema = {
+                    type: "OBJECT",
+                    properties: {
+                        "estimatedSalary": { 
+                            "type": "STRING", 
+                            "description": "The estimated annual salary based on inputs, formatted with commas and currency symbol."
+                        },
+                        "justification": {
+                            "type": "STRING",
+                            "description": "A brief, positive, and confident justification for the estimated salary in English."
+                        }
+                    }
+                };
+
+                const payload = {
+                    contents: [{ parts: [{ text: userQuery }] }],
+                    systemInstruction: { parts: [{ text: systemPrompt }] },
+                    generationConfig: {
+                        responseMimeType: "application/json",
+                        responseSchema: responseSchema
+                    }
+                };
+                
+                const maxRetries = 3;
+                for (let i = 0; i < maxRetries; i++) {
+                    try {
+                        const response = await fetch(apiUrl, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify(payload)
+                        });
+
+                        if (!response.ok) {
+                            throw new Error(`HTTP error! status: ${response.status}`);
+                        }
+
+                        const result = await response.json();
+                        const candidate = result.candidates?.[0];
+
+                        if (candidate && candidate.content?.parts?.[0]?.text) {
+                            const jsonText = candidate.content.parts[0].text;
+                            const parsedData = JSON.parse(jsonText);
+                            return parsedData; // Return the structured data
+                        } else {
+                            throw new Error("Invalid or empty response from API.");
+                        }
+                    } catch (error) {
+                        console.error(`Attempt ${i + 1} failed:`, error);
+                        if (i < maxRetries - 1) {
+                            const delay = Math.pow(2, i) * 1000; // Exponential backoff (1s, 2s, 4s)
+                            await new Promise(resolve => setTimeout(resolve, delay));
+                        } else {
+                            // Fallback to an English hardcoded result if API fails
+                            return {
+                                estimatedSalary: "$165,000",
+                                justification: "AI core system failure. Based on your excellent qualifications, this is your *minimum* potential! Proceed with confidence!" // <-- English fallback
+                            };
+                        }
+                    }
+                }
+            }
+
+            // --- Event Handlers ---
+            startButton.addEventListener('click', async () => {
+                showScreen('loading-indicator');
+
+                try {
+                    const data = await getSalaryEstimate();
+                    
+                    // Update UI with structured results
+                    salaryResultEl.textContent = data.estimatedSalary;
+                    justificationTextEl.textContent = data.justification;
+
+                    showScreen('results-screen');
+                } catch (error) {
+                    console.error("Critical failure:", error);
+                    // Show a friendly error/fallback message
+                    salaryResultEl.textContent = "N/A";
+                    justificationTextEl.textContent = "Sorry, the estimate failed. Please try again. (Fallback)"; // <-- English alert
+                    showScreen('results-screen');
+                }
+            });
+
+            returnButton.addEventListener('click', () => {
+                showScreen('input-screen');
+            });
+
+            // Initial view
+            showScreen('input-screen');
+        });
+    </script>
+</body>
+</html>
