@@ -26,7 +26,7 @@
         <!-- Loading Indicator -->
         <div id="loading-indicator" class="hidden text-center p-8">
             <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-indigo-600 mx-auto"></div>
-            <p class="mt-4 text-gray-600">Calculating complex AI estimations...</p>
+            <p class="mt-4 text-gray-600">Simulating complex AI calculations and analyzing market data...</p>
         </div>
         
         <!-- Screen 1: Input Form -->
@@ -35,7 +35,7 @@
                 ✨ AI Salary Potential Estimator ✨
             </h1>
             <p class="text-gray-500 mb-8 text-center">
-                (Powered by Simulated Gemini AI Logic)
+                (Simulated LLM-Powered Analysis)
             </p>
 
             <!-- Dropdown: Age -->
@@ -115,11 +115,6 @@
             const salaryResultEl = document.getElementById('salary-result');
             const justificationTextEl = document.getElementById('justification-text');
 
-            // --- Authentication and Configuration ---
-            const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-            const apiKey = ""; // Leave as-is for Canvas environment
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-09-2025:generateContent?key=${apiKey}`;
-
             // --- UI Helper Functions ---
             const showScreen = (screenToShow) => {
                 inputScreen.classList.add('hidden');
@@ -128,85 +123,69 @@
                 document.getElementById(screenToShow).classList.remove('hidden');
             };
 
-            // --- LLM API Logic (Demonstrating AI Coding Knowledge) ---
-            async function getSalaryEstimate() {
+            /**
+             * Simulated LLM function to calculate salary and justification.
+             * This function replaces the unreliable API call with deterministic, variable logic
+             * to demonstrate structured data processing.
+             */
+            async function simulateSalaryEstimate() {
+                // Introduce a delay to mimic API latency (demonstrates async coding)
+                await new Promise(resolve => setTimeout(resolve, 1500)); 
+
                 // 1. Collect user inputs
                 const age = document.getElementById('age').value;
                 const experience = document.getElementById('experience').value;
                 const skills = document.getElementById('skills').value;
                 const location = document.getElementById('location').value;
-
-                // 2. Construct the system prompt and user query
-                const systemPrompt = "You are a professional AI Salary Predictor specializing in tech jobs. Provide a highly optimistic and encouraging salary estimate. The output MUST be a strict JSON object following the provided schema.";
                 
-                const userQuery = `Estimate the annual base salary for a person with the following attributes:
-                    - Age Range: ${age}
-                    - Experience Level: ${experience}
-                    - Primary Skills: ${skills}
-                    - Location: ${location}
-                    Provide the estimated salary formatted as a string (e.g., "$150,000") and a confident, positive justification in English.`; // <-- Requesting justification in English
-                
-                // 3. Define the desired structured JSON output schema
-                const responseSchema = {
-                    type: "OBJECT",
-                    properties: {
-                        "estimatedSalary": { 
-                            "type": "STRING", 
-                            "description": "The estimated annual salary based on inputs, formatted with commas and currency symbol."
-                        },
-                        "justification": {
-                            "type": "STRING",
-                            "description": "A brief, positive, and confident justification for the estimated salary in English."
-                        }
-                    }
-                };
+                let baseSalary = 80000; // Starting base salary (USD)
+                let multiplier = 1.0;
+                let justification = "Based on entry-level parameters, your starting potential is competitive. Focus on skill development!";
 
-                const payload = {
-                    contents: [{ parts: [{ text: userQuery }] }],
-                    systemInstruction: { parts: [{ text: systemPrompt }] },
-                    generationConfig: {
-                        responseMimeType: "application/json",
-                        responseSchema: responseSchema
-                    }
-                };
-                
-                const maxRetries = 3;
-                for (let i = 0; i < maxRetries; i++) {
-                    try {
-                        const response = await fetch(apiUrl, {
-                            method: 'POST',
-                            headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify(payload)
-                        });
-
-                        if (!response.ok) {
-                            throw new Error(`HTTP error! status: ${response.status}`);
-                        }
-
-                        const result = await response.json();
-                        const candidate = result.candidates?.[0];
-
-                        if (candidate && candidate.content?.parts?.[0]?.text) {
-                            const jsonText = candidate.content.parts[0].text;
-                            const parsedData = JSON.parse(jsonText);
-                            return parsedData; // Return the structured data
-                        } else {
-                            throw new Error("Invalid or empty response from API.");
-                        }
-                    } catch (error) {
-                        console.error(`Attempt ${i + 1} failed:`, error);
-                        if (i < maxRetries - 1) {
-                            const delay = Math.pow(2, i) * 1000; // Exponential backoff (1s, 2s, 4s)
-                            await new Promise(resolve => setTimeout(resolve, delay));
-                        } else {
-                            // Fallback to an English hardcoded result if API fails
-                            return {
-                                estimatedSalary: "$165,000",
-                                justification: "AI core system failure. Based on your excellent qualifications, this is your *minimum* potential! Proceed with confidence!" // <-- English fallback
-                            };
-                        }
-                    }
+                // 2. Adjust Multiplier based on Experience
+                if (experience === '3-5') {
+                    multiplier += 0.4; // Mid-level boost
+                    justification = "Your solid experience foundation positions you well above the average. Market data indicates strong growth potential.";
+                } else if (experience === '6-10') {
+                    multiplier += 0.8; // Senior boost
+                    justification = "As a highly experienced candidate, your salary reflects strong industry recognition and leadership capabilities.";
+                } else if (experience === '10+') {
+                    multiplier += 1.2; // Expert boost
+                    justification = "With over a decade of expertise, your strategic value commands a premium in the global tech market.";
                 }
+
+                // 3. Adjust Multiplier based on Skills
+                if (skills === 'Data Science/AI' || skills === 'Cloud Engineering') {
+                    multiplier += 0.3; // High-demand skill boost
+                    justification += " Furthermore, your high-demand **" + skills + "** expertise adds significant value, pushing your ceiling higher.";
+                } else if (skills === 'Full Stack Development') {
+                    multiplier += 0.15;
+                    justification += " The versatility of your **" + skills + "** skills ensures a consistent and high market demand.";
+                }
+
+                // 4. Adjust Multiplier based on Location (Cost of Living/Tech Demand)
+                if (location === 'Silicon Valley, CA' || location === 'New York, NY' || location === 'Seattle, WA') {
+                    multiplier += 0.5; // High cost of living/tech concentration boost
+                    justification += " Finally, your location in a premium market like **" + location + "** significantly adjusts the compensation floor upwards.";
+                } else if (location === 'Austin, TX') {
+                    multiplier += 0.25;
+                    justification += " Your presence in the growing tech hub of **" + location + "** gives you excellent negotiating power.";
+                }
+                
+                // 5. Final Calculation and Formatting
+                const calculatedSalary = Math.round((baseSalary * multiplier) / 5000) * 5000; // Round to nearest $5,000 for a cleaner estimate
+                const formattedSalary = new Intl.NumberFormat('en-US', {
+                    style: 'currency',
+                    currency: 'USD',
+                    minimumFractionDigits: 0,
+                    maximumFractionDigits: 0,
+                }).format(calculatedSalary);
+
+                // Simulate the structured JSON output (demonstrates LLM structured response handling)
+                return {
+                    estimatedSalary: formattedSalary,
+                    justification: justification
+                };
             }
 
             // --- Event Handlers ---
@@ -214,7 +193,8 @@
                 showScreen('loading-indicator');
 
                 try {
-                    const data = await getSalaryEstimate();
+                    // Call the simulated function
+                    const data = await simulateSalaryEstimate();
                     
                     // Update UI with structured results
                     salaryResultEl.textContent = data.estimatedSalary;
@@ -222,10 +202,10 @@
 
                     showScreen('results-screen');
                 } catch (error) {
-                    console.error("Critical failure:", error);
+                    console.error("Critical failure during simulation:", error);
                     // Show a friendly error/fallback message
                     salaryResultEl.textContent = "N/A";
-                    justificationTextEl.textContent = "Sorry, the estimate failed. Please try again. (Fallback)"; // <-- English alert
+                    justificationTextEl.textContent = "Sorry, an internal error occurred during calculation. (Please try again)."; 
                     showScreen('results-screen');
                 }
             });
